@@ -1,9 +1,11 @@
+//calling out html elements
 var movieContainer = $(".movies-container");
 var movieTitle = document.getElementById("movie-title")
 var searchInput = document.querySelector("#search_input");
 var elems = document.querySelector('.modal');
 var historySection = $("#history-container");
 
+//declaring variables, need to be set appropriately for const vs  let, etc etc
 var modalInstance;
 var searchArray = [];
 var searchName = "";
@@ -49,7 +51,8 @@ const providers = {
 
   
 //---API Functions---//
-
+//Should return an array of movie objects
+//String search by Movie Name, function returns and array of movie objects
 var getMovie = async function (movieSting) {
   // format the github api Url
   var apiUrl = "https://api.themoviedb.org/3/search/movie?api_key=" + tmdbApiKey + "&language=en-US&query=" + encodeURI(movieSting) + "&page=1&include_adult=false";
@@ -78,7 +81,7 @@ await fetch(apiUrl).then(function(response){
 }
 
 //Search Actor API
-
+//Search actor by name (string), returns the TMDB id of the actor
 var searchActorName = async function (name) {
   console.log("Getting Actor Id!")
   //set actorId to blank
@@ -87,6 +90,7 @@ var searchActorName = async function (name) {
   var actorName = "https://api.themoviedb.org/3/search/person?api_key=346f7b7cb4a8eacfd5f60caf07af955f&language=en-US&query=" + encodeURI(name) + "&page=1&include_adult=false";
   //console.log(actorName);
 
+  //should return the actorId directly to actorId
  await fetch(actorName).then(function(res) {
         return res.json();
       }).then(function(data) {
@@ -99,50 +103,14 @@ var searchActorName = async function (name) {
 
 };
 
+//Search movie by TMDB id, returns a movie object
 var getMovieId = function (id) {
   console.log("Getting Ids of movies!");
   const apiUrl = "https://api.themoviedb.org/3/discover/movie?api_key="+tmdbApiKey+"&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1&with_people="+id+"&with_watch_monetization_types=flatrate"
-  //console.log(apiUrl);
-
+ 
   //clear movies in the event of the function being called again
   movies = [];
 
-  // fetch(apiUrl).then(function (response) {
-  //   if (response.ok) {
-  //     response.json().then(async function (data) {
-  //       //console.log(data);
-  //       //iterate through each element and set data // will need to solve for limits
-  //       data.results.forEach( function (element, index) {
-
-  //         var movieObj = {
-  //           title: element.original_title,
-  //           id: element.id,
-  //           poster: element.poster_path,
-  //           overview: element.overview,
-  //           streams: ""
-  //         }
-          
-  //         movies.push(movieObj);
-          
-  //       })
-
-  //       await getAllMovieInfo();
-  //     }).then(() => {
-  //       var startIndex = page * moviePullLimit - moviePullLimit;
-  //       var constraint = moviePullLimit * page;
-  //       //console.log(startIndex, constraint);
-        
-  //       for (var i = startIndex; i < constraint; i++){
-  //         console.log("I'm display movies now");
-  //         displayMovies(movies[i]);
-  //       }
-  //     })
-  //   }
-  //   else {
-  //     //trigger modal
-  //     triggerModal("Something is wrong with the connection. Please try again later");
-  //   }
-  // })
   fetch(apiUrl).then(function (response) {
     if (response.ok) {
       return response.json()
@@ -185,6 +153,8 @@ var getMovieId = function (id) {
 
 }
 
+//this has to be replaced with a TMDB equivalent
+//retrieves the cast and streaming providers based on movie id and adds that data to the object at the provided index
 var getMovieInfo = async function (movieId,index) {
     const options = {
         method: 'GET',
