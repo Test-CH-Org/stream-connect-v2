@@ -1,11 +1,11 @@
 {
   "ExpandedNodes": [
     "",
-    "\\stream-connect-v2",
-    "\\stream-connect-v2\\src",
-    "\\stream-connect-v2\\src\\components",
-    "\\stream-connect-v2\\src\\components\\testComponent"
+    "\\client",
+    "\\client\\src",
+    "\\client\\src\\components",
+    "\\client\\src\\components\\footer"
   ],
-  "SelectedNode": "\\stream-connect-v2\\src\\App.js",
+  "SelectedNode": "\\client\\src\\components\\footer\\index.js",
   "PreviewInSolutionExplorer": false
 }
