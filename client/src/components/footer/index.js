@@ -10,7 +10,10 @@ const Footer = () => {
                 display: 'flex',
                 justifyContent: 'space-around',
                 py: 2,
-                bgcolor: '#11171E'
+                bgcolor: '#11171E',
+                width: '100%',
+                position: 'absolute',
+                bottom: 0
             }}
                 className="container footer"
             >
