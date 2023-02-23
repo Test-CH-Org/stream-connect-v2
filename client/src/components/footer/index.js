@@ -6,7 +6,13 @@ const Footer = () => {
 
     return (
         <footer>
-            <Box bgcolor="#11171E" className="container footer">
+            <Box sx={{
+                py: 2,
+                bgcolor: '#11171E'
+            }}
+                className="container footer"
+            >
+
                 <Typography color="#fff" align="center">
                     Get copyrighted {copy}
                 </Typography>
