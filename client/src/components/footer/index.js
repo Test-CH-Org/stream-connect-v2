@@ -7,6 +7,8 @@ const Footer = () => {
     return (
         <footer>
             <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-around',
                 py: 2,
                 bgcolor: '#11171E'
             }}
