@@ -1,18 +1,16 @@
 import React from "react";
-import Typography from '@mui/material/Typography';
+import { Box, Typography } from '@mui/material/';
 
 const Footer = () => {
     let copy = String.fromCodePoint(0x00A9);
 
     return (
-        <footer
-            className="mui--text-light"
-        >
-            <div className="container footer">
-                <Typography color="common.black" align="center">
+        <footer>
+            <Box bgcolor="#11171E" className="container footer">
+                <Typography color="#fff" align="center">
                     Get copyrighted {copy}
                 </Typography>
-            </div>
+            </Box>
         </footer>
     )
 }
