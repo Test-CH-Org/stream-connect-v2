@@ -1,0 +1,3 @@
+DROP DATABASE IF EXISTS fugtv_db;
+
+CREATE DATABASE fugtv_db;
