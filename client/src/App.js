@@ -8,7 +8,7 @@ import './App.css';
 
 function App() {
     return (
-        <Box height="100%" className="flex-column justify-flex-start min-100-vh container">
+        <Box minHeight="100vh" className="flex-column justify-flex-start min-100-vh container">
             <Footer />
         </Box>
     );
