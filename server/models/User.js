@@ -35,6 +35,17 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    lockedOut: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+        },
+    loginAttempts: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    lastFailedLogin: {
+        type: DataTypes.STRING,
+    }
   },
   {
     hooks: {

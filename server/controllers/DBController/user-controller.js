@@ -1,17 +1,7 @@
 const router = require("express").Router();
 const { User, SearchLog } = require("../../models");
+const dayjs = require('dayjs');
 
-//get all users, can add parameters to the req body
-router.get("/", (req, res) => {
-	User.findAll({
-		attributes: { exclude: ["password"] },
-	})
-		.then((dbUserData) => res.status(200).json(dbUserData))
-		.catch((err) => {
-			console.log(err);
-			res.status(500).json(err);
-		});
-});
 
 //create a new user/ sign up
 router.post("/", (req, res) => {
@@ -43,8 +33,11 @@ router.post("/login", (req, res) => {
 			return;
 		}
 		const validPassword = dbUserData.checkPassword(req.body.password);
-		if (!validPassword) {
-			res.status(400).json({ message: "Incorrect password" });
+        if (!validPassword) {
+            //add update here to increase the number of logged in attempts
+            //will need to also have an easy way to check if the user is currently locked out.
+            //https://sequelize.org/docs/v6/core-concepts/model-instances/
+			res.status(400).json({ message: "Invalid Credentials, please try again" });
 			return;
 		}
 		req.session.save(() => {
@@ -99,5 +92,9 @@ router.get("/:id", (req, res) => {
 			});
 	}
 });
+
+//change password route
+
+//update user information (like email)
 
 module.exports = router;
