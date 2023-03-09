@@ -23,11 +23,14 @@ router.post("/", (req, res) => {
 			res.status(500).json(err);
 		});
 });
+
 router.post("/login", async (req, res) => {
 
 	var usr = await User.findOne({
 		where: { email: req.body.email },
     })
+
+    console.log(usr);
     
     if(!usr) {
         res
@@ -36,34 +39,34 @@ router.post("/login", async (req, res) => {
 			return;
     }
 
-    const validPassword = usr.checkPassword(req.body.password);
+	const validPassword = await usr.checkPassword(req.body.password);
 
     if (!validPassword) {
+        //console.log("Invalid Password");
         usr.increment({ 'loginAttempts': 1 });
         usr.lastFailedLogin = dayjs().toString();
 
-
-        
         if (usr.loginAttempts > 3) {
             usr.lockedOut = true;
-            await usr.save();
+            await usr.save({ fields: ['lastFailedLogin','lockedOut'] });
             res
                 .status(400)
                 .json({ message: messages.lockedOut });
             return;
         }
 
-        await usr.save();
+        await usr.save({ fields: ['lastFailedLogin'] });
         res.status(400).json({ message: messages.invalidCreds });
 			return;
     }
     else {
+        //console.log("Valid Password");
         var now = dayjs()
         if (dayjs(usr.lastFailedLogin).diff(now, 'minute') > 15) {
             usr.loginAttempts = 0;
             usr.lockedOut = false;
         }
-        else {
+        else if(usr.lockedOut) { //if they are still locked out
             res
                 .status(400)
                 .json({ message: messages.lockedOut });
@@ -73,13 +76,37 @@ router.post("/login", async (req, res) => {
 
     req.session.save(() => {
 			req.session.user_id = usr.id;
-			req.session.username = usr.username;
+			req.session.username = usr.email;
 			req.session.loggedIn = true;
 
 			res.json({ user: usr, message: messages.loginSuccess });
 		});
         
 });
+
+router.post("/reset", async (req, res) => {//will need to consider the context of when this becomes available.
+    var usr = await User.findOne({
+        where: {email: req.body.email}
+    })
+
+
+	if (!usr) {
+		res.status(400).json({message: messages.userNotFound});
+	}
+
+    const validPassword = await usr.checkPassword(req.body.password);
+
+    if (validPassword) {
+		usr.password = req.body.newPassword;
+		usr.lockedOut = false;
+		usr.loginAttempts = 0;
+        usr.save();
+        res.json({ message: messages.passwordReset });
+        return;
+    }
+
+    res.status(400).json({ message: messages.invalidCreds });
+})
 
 router.post("/logout", (req, res) => {
 	if (req.session.loggedIn) {
