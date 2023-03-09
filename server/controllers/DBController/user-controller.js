@@ -1,17 +1,8 @@
 const router = require("express").Router();
 const { User, SearchLog } = require("../../models");
-
-//get all users, can add parameters to the req body
-router.get("/", (req, res) => {
-	User.findAll({
-		attributes: { exclude: ["password"] },
-	})
-		.then((dbUserData) => res.status(200).json(dbUserData))
-		.catch((err) => {
-			console.log(err);
-			res.status(500).json(err);
-		});
-});
+const dayjs = require('dayjs');
+const messages = require("../../utils/messages");
+var generator = require('generate-password');
 
 //create a new user/ sign up
 router.post("/", (req, res) => {
@@ -32,30 +23,108 @@ router.post("/", (req, res) => {
 			res.status(500).json(err);
 		});
 });
-router.post("/login", (req, res) => {
-	User.findOne({
+
+router.post("/login", async (req, res) => {
+
+	var usr = await User.findOne({
 		where: { email: req.body.email },
-	}).then((dbUserData) => {
-		if (!dbUserData) {
+    })
+
+    console.log(usr);
+    
+    if(!usr) {
+        res
+			.status(400)
+			.json({ message: messages.userNotFound });
+			return;
+    }
+
+	const validPassword = await usr.checkPassword(req.body.password);
+
+    if (!validPassword) {
+        //console.log("Invalid Password");
+        usr.increment({ 'loginAttempts': 1 });
+        usr.lastFailedLogin = dayjs().toString();
+
+
+		if (usr.loginAttempts > 9) {
+			
+			usr.password = generator.generate({
+				length: 23,
+				numbers: true
+			});
+			await usr.save({ fields: ['password'] });
+
 			res
-				.status(400)
-				.json({ message: "could not find user with that email address" });
-			return;
+                .status(400)
+                .json({ message: messages.securityLock });
+            return;
+
 		}
-		const validPassword = dbUserData.checkPassword(req.body.password);
-		if (!validPassword) {
-			res.status(400).json({ message: "Incorrect password" });
+        else if (usr.loginAttempts > 3) {
+            usr.lockedOut = true;
+            await usr.save({ fields: ['lastFailedLogin','lockedOut'] });
+            res
+                .status(400)
+                .json({ message: messages.lockedOut });
+            return;
+        }
+
+        await usr.save({ fields: ['lastFailedLogin'] });
+        res.status(400).json({ message: messages.invalidCreds });
 			return;
+    }
+    else {
+        //console.log("Valid Password");
+		var now = dayjs()
+//testing
+		if (dayjs(usr.lastFailedLogin).diff(now, 'minutes') < -15) { //calculates the difference in reverse. So we are looking for 15 minutes have passed.
+            usr.loginAttempts = 0;
+            usr.lockedOut = false;
+        }
+		else if (usr.lockedOut) { //if they are still locked out
+            res
+                .status(400)
+                .json({ message: messages.lockedOut });
+            return;
 		}
-		req.session.save(() => {
-			req.session.user_id = dbUserData.id;
-			req.session.username = dbUserData.username;
+	}
+	
+	usr.lastLogon = dayjs().toString();
+
+    req.session.save(() => {
+			req.session.user_id = usr.id;
+			req.session.username = usr.email;
 			req.session.loggedIn = true;
 
-			res.json({ user: dbUserData, message: "login succesful" });
+			res.json({ user: usr, message: messages.loginSuccess });
 		});
-	});
+        
 });
+
+router.post("/reset", async (req, res) => {//will need to consider the context of when this becomes available.
+    var usr = await User.findOne({
+        where: {email: req.body.email}
+    })
+
+
+	if (!usr) {
+		res.status(400).json({message: messages.userNotFound});
+	}
+
+    const validPassword = await usr.checkPassword(req.body.password);
+
+    if (validPassword) {
+		usr.password = req.body.newPassword;
+		usr.lockedOut = false;
+		usr.loginAttempts = 0;
+        usr.save();
+        res.json({ message: messages.passwordReset });
+        return;
+    }
+
+    res.status(400).json({ message: messages.invalidCreds });
+})
 
 router.post("/logout", (req, res) => {
 	if (req.session.loggedIn) {
@@ -99,5 +168,9 @@ router.get("/:id", (req, res) => {
 			});
 	}
 });
+
+//change password route
+
+//update user information (like email)
 
 module.exports = router;

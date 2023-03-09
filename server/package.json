@@ -5,17 +5,22 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "connect-session-sequelize": "^7.1.5",
+    "dayjs": "^1.11.7",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
+    "generate-password": "^1.7.0",
     "mysql2": "^3.1.2",
-    "sequelize": "^6.28.0"
+    "nodemon": "^2.0.21",
+    "password-generate": "^1.1.1",
+    "sequelize": "^6.28.0",
+    "uuid": "^9.0.0"
   }
 }

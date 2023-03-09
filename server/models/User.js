@@ -1,6 +1,8 @@
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../config/connection");
 const bcrypt = require("bcrypt");
+const { v4: uuidv4 } = require('uuid');
+
 class User extends Model {
   // set up method to run on instance data (per user) to check password
   checkPassword(loginPw) {
@@ -35,6 +37,24 @@ User.init(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    lockedOut: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+        },
+    loginAttempts: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0
+    },
+    lastLogon: {
+      type: DataTypes.STRING
+    },
+    lastFailedLogin: {
+        type: DataTypes.STRING,
+    },
+    resetKey: {
+      type: DataTypes.STRING,
+      defaultValue: uuidv4().toString()
+    }
   },
   {
     hooks: {
