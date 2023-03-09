@@ -2,7 +2,7 @@ const router = require("express").Router();
 const { User, SearchLog } = require("../../models");
 const dayjs = require('dayjs');
 const messages = require("../../utils/messages");
-
+var generator = require('generate-password');
 
 //create a new user/ sign up
 router.post("/", (req, res) => {
@@ -49,7 +49,17 @@ router.post("/login", async (req, res) => {
 
 		if (usr.loginAttempts > 9) {
 			
-			usr.active = false;
+			usr.password = generator.generate({
+				length: 23,
+				numbers: true
+			});
+			await usr.save({ fields: ['password'] });
+
+			res
+                .status(400)
+                .json({ message: messages.securityLock });
+            return;
+
 		}
         else if (usr.loginAttempts > 3) {
             usr.lockedOut = true;
@@ -73,13 +83,14 @@ router.post("/login", async (req, res) => {
             usr.lockedOut = false;
         }
 		else if (usr.lockedOut) { //if they are still locked out
-
             res
                 .status(400)
                 .json({ message: messages.lockedOut });
             return;
-        }
-    }
+		}
+	}
+	
+	usr.lastLogon = dayjs().toString();
 
     req.session.save(() => {
 			req.session.user_id = usr.id;
