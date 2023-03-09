@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const { User, SearchLog } = require("../../models");
 const dayjs = require('dayjs');
+const messages = require("../../utils/messages");
 
 
 //create a new user/ sign up
@@ -22,32 +23,62 @@ router.post("/", (req, res) => {
 			res.status(500).json(err);
 		});
 });
-router.post("/login", (req, res) => {
-	User.findOne({
+router.post("/login", async (req, res) => {
+
+	var usr = await User.findOne({
 		where: { email: req.body.email },
-	}).then((dbUserData) => {
-		if (!dbUserData) {
-			res
-				.status(400)
-				.json({ message: "could not find user with that email address" });
+    })
+    
+    if(!usr) {
+        res
+			.status(400)
+			.json({ message: messages.userNotFound });
 			return;
-		}
-		const validPassword = dbUserData.checkPassword(req.body.password);
-        if (!validPassword) {
-            //add update here to increase the number of logged in attempts
-            //will need to also have an easy way to check if the user is currently locked out.
-            //https://sequelize.org/docs/v6/core-concepts/model-instances/
-			res.status(400).json({ message: "Invalid Credentials, please try again" });
+    }
+
+    const validPassword = usr.checkPassword(req.body.password);
+
+    if (!validPassword) {
+        usr.increment({ 'loginAttempts': 1 });
+        usr.lastFailedLogin = dayjs().toString();
+
+
+        
+        if (usr.loginAttempts > 3) {
+            usr.lockedOut = true;
+            await usr.save();
+            res
+                .status(400)
+                .json({ message: messages.lockedOut });
+            return;
+        }
+
+        await usr.save();
+        res.status(400).json({ message: messages.invalidCreds });
 			return;
-		}
-		req.session.save(() => {
-			req.session.user_id = dbUserData.id;
-			req.session.username = dbUserData.username;
+    }
+    else {
+        var now = dayjs()
+        if (dayjs(usr.lastFailedLogin).diff(now, 'minute') > 15) {
+            usr.loginAttempts = 0;
+            usr.lockedOut = false;
+        }
+        else {
+            res
+                .status(400)
+                .json({ message: messages.lockedOut });
+            return;
+        }
+    }
+
+    req.session.save(() => {
+			req.session.user_id = usr.id;
+			req.session.username = usr.username;
 			req.session.loggedIn = true;
 
-			res.json({ user: dbUserData, message: "login succesful" });
+			res.json({ user: usr, message: messages.loginSuccess });
 		});
-	});
+        
 });
 
 router.post("/logout", (req, res) => {
