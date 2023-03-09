@@ -46,7 +46,12 @@ router.post("/login", async (req, res) => {
         usr.increment({ 'loginAttempts': 1 });
         usr.lastFailedLogin = dayjs().toString();
 
-        if (usr.loginAttempts > 3) {
+
+		if (usr.loginAttempts > 9) {
+			
+			usr.active = false;
+		}
+        else if (usr.loginAttempts > 3) {
             usr.lockedOut = true;
             await usr.save({ fields: ['lastFailedLogin','lockedOut'] });
             res
@@ -61,12 +66,14 @@ router.post("/login", async (req, res) => {
     }
     else {
         //console.log("Valid Password");
-        var now = dayjs()
-        if (dayjs(usr.lastFailedLogin).diff(now, 'minute') > 15) {
+		var now = dayjs()
+//testing
+		if (dayjs(usr.lastFailedLogin).diff(now, 'minutes') < -15) { //calculates the difference in reverse. So we are looking for 15 minutes have passed.
             usr.loginAttempts = 0;
             usr.lockedOut = false;
         }
-        else if(usr.lockedOut) { //if they are still locked out
+		else if (usr.lockedOut) { //if they are still locked out
+
             res
                 .status(400)
                 .json({ message: messages.lockedOut });
