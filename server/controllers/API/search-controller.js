@@ -17,7 +17,7 @@ router.get("/byActor", async (req, res) => {
 })
 
 function getActorId(actorName) {
-    const url = 'https://api.themoviedb.org/3/search/person?api_key=' + process.env.TMDB_KEY + "&language=en-US&page=1&include_adult=false&query=" + encodeURI(actorName);
+    const url = `https://api.themoviedb.org/3/search/person?api_key=${process.env.TMDB_KEY}&language=en-US&page=1&include_adult=false&query=${encodeURI(actorName)}`;
 
     return fetch(url).then(function(res) {
         return res.json();
