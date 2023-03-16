@@ -12,7 +12,7 @@ router.get("/byActor", async (req, res) => {
         return
     }
 
-    const url = 
+    const url = `https://api.themoviedb.org/3/person/${actorId}/movie_credits?api_key=${process.env.TMDB_KEY}`
     
 })
 
