@@ -4,7 +4,11 @@
     "\\client",
     "\\client\\src",
     "\\client\\src\\components",
-    "\\client\\src\\components\\footer"
+    "\\client\\src\\components\\footer",
+    "\\client\\src\\components\\searchResults",
+    "\\client\\src\\components\\testComponent",
+    "\\server",
+    "\\server\\controllers"
   ],
   "SelectedNode": "\\client\\src\\components\\footer\\index.js",
   "PreviewInSolutionExplorer": false
