@@ -7,4 +7,5 @@ const messages = {
     passwordReset: "Password successfully reset!",
     securityLock: "This account has been locked for Security reasons. Check the email associated with your account for a reset link"
 }
+
 module.exports = messages;

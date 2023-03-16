@@ -7,6 +7,7 @@ var generator = require('generate-password');
 //create a new user/ sign up
 router.post("/", (req, res) => {
 	User.create({
+		username: req.body.username,
 		email: req.body.email,
 		password: req.body.password,
 	})
@@ -125,6 +126,10 @@ router.post("/reset", async (req, res) => {//will need to consider the context o
 
     res.status(400).json({ message: messages.invalidCreds });
 })
+
+// router.post("/reset:resetKey", async (req, res) => { //reset with email
+
+// });
 
 router.post("/logout", (req, res) => {
 	if (req.session.loggedIn) {

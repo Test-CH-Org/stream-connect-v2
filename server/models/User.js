@@ -33,6 +33,10 @@ User.init(
         len: [8],
       },
     },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false
+    },
     active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
