@@ -1,6 +1,5 @@
 import React from 'react';
-import { ImageList, ImageListItem, Box, Grid } from '@mui/material/';
-import Avengers from '../../images/Avengers.webp'
+import { ImageList, ImageListItem, Box } from '@mui/material/';
 
 const searchResults = () => {
     const itemData = [
@@ -56,7 +55,7 @@ const searchResults = () => {
 
     return (
         <Box>
-            <ImageList sx={{ width: 500, height: 450 }} cols={3} rowHeight={164}>
+            <ImageList cols={3} rowHeight={164}>
                 {itemData.map((item) => (
                     <ImageListItem key={item.img}>
                         <img
