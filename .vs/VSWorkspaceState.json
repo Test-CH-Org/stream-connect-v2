@@ -4,8 +4,13 @@
     "\\client",
     "\\client\\src",
     "\\client\\src\\components",
-    "\\client\\src\\components\\footer"
+    "\\client\\src\\components\\footer",
+    "\\client\\src\\components\\testComponent",
+    "\\server",
+    "\\server\\controllers",
+    "\\server\\models",
+    "\\server\\utils"
   ],
-  "SelectedNode": "\\client\\src\\components\\footer\\index.js",
+  "SelectedNode": "\\server\\utils\\auth.js",
   "PreviewInSolutionExplorer": false
 }
