@@ -17,12 +17,21 @@ router.get("/byActor", async (req, res) => {
   const movieData = fetch(url).then(res => {
     return res.json();
   }).then(data => {
-    return data.cast;
+    return data;
+  }).catch(err => {
+    return err;
   })
 
-  movieData.forEach(movie => {
-    
+  if (!movieData.cast) {
+    return res.status(500).json(movieData);
+  }
+
+  const results = []; //may need to conider something async here
+  movieData.cast.forEach(movie => {
+    results.push(getProviders(movie.id));
   })
+
+
     
 })
 
@@ -38,6 +47,27 @@ function getActorId(actorName) {
       .catch (err => {
         return err
       })
-}
+};
+
+function getProviders(movieId) {
+  const url = `https://api.themoviedb.org/3/movie/${movieId}/watch/providers?api_key=${process.env.TMDB_KEY}&language=en-US&watch_region=US`;
+
+  return fetch(url).then(res => {
+    return res.json();
+  }).then(data => {
+    if (data.results.US.flatrate) {
+        return {
+        movieId: data.id,
+        providers: data.results.US.flatrate
+      }
+    }
+
+    return
+    
+  }).catch(err => {
+    return //log the error
+  })
+
+};
 
 module.exports = router;
