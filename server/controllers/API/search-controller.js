@@ -5,14 +5,24 @@ require('dotenv').config();
 //
 router.get("/byActor", async (req, res) => {
 
-    var actorId = await getActorId(req.actorName);
+    var actorId = await getActorId(req.body.actorName);
 
     if (isNaN(actorId)) {
         res.status(500).json(actorId);
         return
     }
 
-    const url = `https://api.themoviedb.org/3/person/${actorId}/movie_credits?api_key=${process.env.TMDB_KEY}`
+  const url = `https://api.themoviedb.org/3/person/${actorId}/movie_credits?api_key=${process.env.TMDB_KEY}`
+  
+  const movieData = fetch(url).then(res => {
+    return res.json();
+  }).then(data => {
+    return data.cast;
+  })
+
+  movieData.forEach(movie => {
+    
+  })
     
 })
 
